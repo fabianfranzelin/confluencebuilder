@@ -15,6 +15,7 @@ from .exceptions import ConfluenceSslError
 from .exceptions import ConfluenceTimeoutError
 from .std.confluence import API_REST_BIND_PATH
 from requests.adapters import HTTPAdapter
+from requests.auth import HTTPBasicAuth
 import json
 import requests
 import ssl
@@ -45,6 +46,7 @@ class Rest:
     CONFLUENCE_DEFAULT_ENCODING = 'utf-8'
 
     def __init__(self, config):
+        self.config = config
         self.url = config.confluence_server_url
         self.session = self._setup_session(config)
         self.verbosity = config.sphinx_verbosity
@@ -85,7 +87,9 @@ class Rest:
             passwd = config.confluence_server_pass
             if passwd is None:
                 passwd = ''
-            session.auth = (config.confluence_server_user, passwd)
+            self.athena_auth = HTTPBasicAuth(config.confluence_server_user,
+                                             passwd)
+            # session.auth = (config.confluence_server_user, passwd)
 
         if config.confluence_server_cookies:
             session.cookies.update(config.confluence_server_cookies)
@@ -95,7 +99,9 @@ class Rest:
     def get(self, key, params):
         restUrl = self.url + API_REST_BIND_PATH + '/' + key
         try:
-            rsp = self.session.get(restUrl, params=params)
+            rsp = self.session.get(restUrl, params=params,
+                                   cert=self.config.confluence_client_cert,
+                                   auth=self.athena_auth)
         except requests.exceptions.Timeout:
             raise ConfluenceTimeoutError(self.url)
         except requests.exceptions.SSLError as ex:
