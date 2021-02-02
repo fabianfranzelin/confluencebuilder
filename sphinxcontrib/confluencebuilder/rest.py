@@ -52,10 +52,10 @@ class Rest:
         self.verbosity = config.sphinx_verbosity
 
     def _api_rest_bind_path(self):
-        if self.config.confluence_rest_api_bind_path:
-            return self.config.confluence_rest_api_bind_path
-        else:
+        if self.config.confluence_rest_api_bind_path is None:
             return API_REST_BIND_PATH
+        else:
+            return self.config.confluence_rest_api_bind_path
 
     def _setup_session(self, config):
         session = requests.Session()
