@@ -160,6 +160,10 @@ def setup(app):
     app.add_config_value('confluence_server_auth', None, False)
     """Cookie(s) to use for Confluence REST interaction."""
     app.add_config_value('confluence_server_cookies', None, False)
+    """Server header for Confluence REST interaction."""
+    app.add_config_value('confluence_server_header', None, False)
+    """REST API bind path for Confluence REST interaction."""
+    app.add_config_value('confluence_rest_api_bind_path', None, False)
 
     """(configuration - advanced processing)"""
     """Filename suffix for generated files."""

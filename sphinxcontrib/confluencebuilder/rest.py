@@ -51,11 +51,20 @@ class Rest:
         self.session = self._setup_session(config)
         self.verbosity = config.sphinx_verbosity
 
+    def _api_rest_bind_path(self):
+        if self.config.confluence_rest_api_bind_path:
+            return self.config.confluence_rest_api_bind_path
+        else:
+            return API_REST_BIND_PATH
+
     def _setup_session(self, config):
         session = requests.Session()
         session.headers.update({
             'User-Agent': 'Sphinx Confluence Builder',
         })
+        if config.confluence_server_headers:
+            session.headers.update(config.confluence_server_headers)
+
         session.timeout = config.confluence_timeout
         session.proxies = {
             'http': config.confluence_proxy,
@@ -87,9 +96,8 @@ class Rest:
             passwd = config.confluence_server_pass
             if passwd is None:
                 passwd = ''
-            self.athena_auth = HTTPBasicAuth(config.confluence_server_user,
-                                             passwd)
-            # session.auth = (config.confluence_server_user, passwd)
+            session.auth = HTTPBasicAuth(config.confluence_server_user,
+                                         passwd)
 
         if config.confluence_server_cookies:
             session.cookies.update(config.confluence_server_cookies)
@@ -97,11 +105,10 @@ class Rest:
         return session
 
     def get(self, key, params):
-        restUrl = self.url + API_REST_BIND_PATH + '/' + key
+        restUrl = self.url + self._api_rest_bind_path() + '/' + key
         try:
             rsp = self.session.get(restUrl, params=params,
-                                   cert=self.config.confluence_client_cert,
-                                   auth=self.athena_auth)
+                                   cert=self.config.confluence_client_cert)
         except requests.exceptions.Timeout:
             raise ConfluenceTimeoutError(self.url)
         except requests.exceptions.SSLError as ex:
@@ -129,7 +136,7 @@ class Rest:
         return json_data
 
     def post(self, key, data, files=None):
-        restUrl = self.url + API_REST_BIND_PATH + '/' + key
+        restUrl = self.url + self._api_rest_bind_path() + '/' + key
         try:
             headers = dict(self.session.headers)
 
@@ -175,7 +182,7 @@ class Rest:
         return json_data
 
     def put(self, key, value, data):
-        restUrl = self.url + API_REST_BIND_PATH + '/' + key + '/' + value
+        restUrl = self.url + self._api_rest_bind_path() + '/' + key + '/' + value
         try:
             rsp = self.session.put(restUrl, json=data)
         except requests.exceptions.Timeout:
@@ -209,7 +216,7 @@ class Rest:
         return json_data
 
     def delete(self, key, value):
-        restUrl = self.url + API_REST_BIND_PATH + '/' + key + '/' + value
+        restUrl = self.url + self._api_rest_bind_path() + '/' + key + '/' + value
         try:
             rsp = self.session.delete(restUrl)
         except requests.exceptions.Timeout:
@@ -234,7 +241,7 @@ class Rest:
         err = ""
         err += "REQ: {0}\n".format(rsp.request.method)
         err += "RSP: " + str(rsp.status_code) + "\n"
-        err += "URL: " + self.url + API_REST_BIND_PATH + "\n"
+        err += "URL: " + self.url + self._api_rest_bind_path() + "\n"
         err += "API: " + key + "\n"
         try:
             err += 'DATA: {}'.format(json.dumps(rsp.json(), indent=2))

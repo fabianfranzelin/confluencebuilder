@@ -884,6 +884,33 @@ default, no cookies are set with a value of ``None``.
 
 --------------------------------------------------------------------------------
 
+confluence_server_headers
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A dictionary value which allows a user to pass key-value header
+information for authentication purposes. By default, no headers are
+set with a value of ``None``.
+
+.. code-block:: python
+
+   confluence_server_headers = {
+       'keyid': '<confluence id string>'
+   }
+
+--------------------------------------------------------------------------------
+
+confluence_rest_api_bind_path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A string value that overwrites the default rest api path. By default,
+no values are set with a value of ``None``.
+
+.. code-block:: python
+
+   confluence_rest_api_bind_path = ''
+
+--------------------------------------------------------------------------------
+
 advanced processing configuration
 ---------------------------------
 
