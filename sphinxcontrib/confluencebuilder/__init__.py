@@ -161,7 +161,7 @@ def setup(app):
     """Cookie(s) to use for Confluence REST interaction."""
     app.add_config_value('confluence_server_cookies', None, False)
     """Server header for Confluence REST interaction."""
-    app.add_config_value('confluence_server_header', None, False)
+    app.add_config_value('confluence_server_headers', None, False)
     """REST API bind path for Confluence REST interaction."""
     app.add_config_value('confluence_rest_api_bind_path', None, False)
 
